@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../utils/axiosConfig'; // ✅ use your token-aware instance
 
 function UserContributions() {
   const [contributions, setContributions] = useState([]);
 
   useEffect(() => {
     axios
-      .get('http://localhost:8080/api/contributions/my', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
+      .get('/api/contributions/my') // ✅ no need to hardcode baseURL or token
       .then((res) => setContributions(res.data))
       .catch((err) => console.error('❌ Error fetching contributions:', err));
   }, []);

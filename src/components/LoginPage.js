@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import API from "../api";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 
@@ -14,10 +14,11 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/login", {
-        email,
-        password,
-      });
+      const response = await API.post("/api/auth/login", {
+  email,
+  password,
+});
+
 
       const {
         token,

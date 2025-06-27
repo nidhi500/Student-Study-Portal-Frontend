@@ -3,8 +3,8 @@ import axios from "axios";
 import { useAuthStore } from "../stores/authStore";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:8080",
-  withCredentials: false,
+  baseURL: "https://student-study-portal-backend.onrender.com",
+  withCredentials: false, // Keep as false unless you use cookies
 });
 
 // ✅ Automatically attach token from Zustand

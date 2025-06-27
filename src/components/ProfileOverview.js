@@ -1,20 +1,23 @@
+// src/components/ProfileOverview.js
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../utils/axiosConfig'; // use custom axios instance
 
 export default function ProfileOverview() {
   const [profile, setProfile] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    axios.get("http://localhost:8080/api/users/profile", {
-  headers: {
-    Authorization: "Bearer " + localStorage.getItem("token")
-  }
-})
-.then(res => console.log(res.data))
-.catch(err => console.error("❌ Error fetching profile:", err));
-
+    axios.get("/api/users/profile")
+      .then(res => setProfile(res.data))
+      .catch(err => {
+        console.error("❌ Error fetching profile:", err);
+        setError("Failed to load profile.");
+      });
   }, []);
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
 
   if (!profile) {
     return <p className="text-gray-500">Loading profile...</p>;

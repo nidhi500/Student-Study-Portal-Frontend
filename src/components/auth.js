@@ -1,10 +1,9 @@
-import axios from "axios";
+// src/services/auth.js
+import API from "../api";
 import { useAuthStore } from "../stores/authStore";
 
-const BASE_URL = "http://localhost:8080/api/auth"; // adjust if needed
-
 export const login = async (email, password) => {
-  const response = await axios.post(`${BASE_URL}/login`, {
+  const response = await API.post("/api/auth/login", {
     email,
     password,
   });
@@ -14,7 +13,7 @@ export const login = async (email, password) => {
 };
 
 export const register = async (name, email, password) => {
-  const response = await axios.post(`${BASE_URL}/register`, {
+  const response = await API.post("/api/auth/register", {
     name,
     email,
     password,

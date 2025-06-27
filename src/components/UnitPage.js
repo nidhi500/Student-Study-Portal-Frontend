@@ -20,8 +20,8 @@ export default function UnitPage() {
   
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/api/subjects/${subjectId}/units`)
+    axios.get(`/api/subjects/${subjectId}/units`)
+
       .then((res) => setUnits(res.data));
   }, [subjectId]);
 
@@ -29,12 +29,12 @@ export default function UnitPage() {
     const unitId = units[activeUnitIndex]?.id;
     if (!unitId) return;
 
-    axios
-      .get(`http://localhost:8080/api/units/${unitId}/resources`)
+    axios.get(`/api/units/${unitId}/resources`)
+
       .then((res) => setResources(res.data));
 
-    axios
-      .get(`http://localhost:8080/api/units/${unitId}/pyqs`)
+    axios.get(`/api/units/${unitId}/pyqs`)
+
       .then((res) => setPyqs(res.data));
   }, [units, activeUnitIndex]);
 

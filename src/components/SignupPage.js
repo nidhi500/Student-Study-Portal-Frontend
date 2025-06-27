@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import API from "../api";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // 👁️ Import eye icons
@@ -80,9 +80,8 @@ function SignupPage() {
     };
 
     try {
-      const res = await axios.post("http://localhost:8080/api/auth/register", requestBody, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await API.post("/api/users/signup", requestBody);
+
 
       const { token, name, email: userEmail, branch, currentSemester, goal } = res.data;
 

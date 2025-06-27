@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/axiosConfig"; // ✅ custom axios
+
 import Header from "../components/Header"; 
 
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
@@ -19,9 +20,7 @@ export default function SubjectPage() {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8080/api/semesters/${semesterId}/subjects?branch=${branch}`
-        );
+        const res = await axios.get(`/api/semesters/${semesterId}/subjects?branch=${branch}`);
         setSubjects(res.data);
       } catch (err) {
         console.error("Error fetching subjects:", err);
