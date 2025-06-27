@@ -7,7 +7,6 @@ function UserContributions() {
   useEffect(() => {
     const fetchContributions = async () => {
       try {
-        const token = localStorage.getItem('token');
         const res = await axios.get('/api/contributions/my');
         setContributions(res.data);
       } catch (err) {

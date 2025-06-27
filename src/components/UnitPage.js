@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useSearchParams } from "react-router-dom";
-import { useAuthStore } from "../stores/authStore";
 import CommentSection from "../components/CommentSection";
 
 export default function UnitPage() {

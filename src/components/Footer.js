@@ -4,13 +4,6 @@ import { useNavigate } from 'react-router-dom';
 function Footer() {
   const navigate = useNavigate();
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

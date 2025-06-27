@@ -5,7 +5,7 @@ import axios from "../utils/axiosConfig";
 import { useAuthStore } from "../stores/authStore";
 
 export default function UserComments() {
-  const { user, token } = useAuthStore();
+  const { user } = useAuthStore();
   const [comments, setComments] = useState([]);
 
   useEffect(() => {

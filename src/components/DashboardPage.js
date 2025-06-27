@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import LogoutButton from "./LogoutButton";
@@ -6,7 +5,6 @@ import LogoutButton from "./LogoutButton";
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user) || {};
   const goal = user.goal || "Not Set";
-  const logout = useAuthStore((state) => state.logout);
 
   const goalDescMap = {
     GATE: "Access GATE books, notes, and videos to build strong core concepts.",
@@ -147,7 +145,7 @@ export default function DashboardPage() {
 
 function DashboardCard({ icon, title, desc, features, link, accent }) {
   return (
-    <Link to={link} className={`bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 ${accent} hover:border-opacity-80 block transform hover:-translate-y-1 h-full flex flex-col justify-between`}>
+    <Link to={link} className={`bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 ${accent} hover:border-opacity-80 transform hover:-translate-y-1 h-full flex flex-col justify-between`}>
       <div>
         <div className="mb-3">{icon}</div>
         <h3 className="text-lg font-semibold text-indigo-700 mb-2">{title}</h3>
