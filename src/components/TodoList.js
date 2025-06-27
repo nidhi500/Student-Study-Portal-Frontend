@@ -9,8 +9,8 @@ function TodoList() {
     { id: 4, text: "Submit Project Report", done: false, userId: 1 }
   ]);
   const [newTask, setNewTask] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [loading] = useState(false);
+  const [error] = useState(null);
 
   const addTodo = () => {
     if (!newTask.trim()) return;
