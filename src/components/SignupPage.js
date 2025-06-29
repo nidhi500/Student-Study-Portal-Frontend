@@ -80,8 +80,7 @@ function SignupPage() {
     };
 
     try {
-      const res = await API.post("/api/users/register", requestBody);
-
+      const res = await API.post("/api/auth/register", requestBody);
 
       const { token, name, email: userEmail, branch, currentSemester, goal } = res.data;
 
