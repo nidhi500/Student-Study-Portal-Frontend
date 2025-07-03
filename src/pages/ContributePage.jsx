@@ -46,11 +46,8 @@ const ContributePage = () => {
   try {
     console.log("🔍 Payload about to send:", JSON.stringify(formData));
 
-await api.post("/api/contributions/add", JSON.stringify(formData), {
-  headers: {
-    "Content-Type": "application/json"
-  }
-});
+await api.post("/api/contributions/add", formData);
+    console.log("✅ Contribution submitted successfully");
     alert("✅ Contribution submitted");
     setFormData({ title: "", description: "", type: "", subject: "", visibility: "", url: "" });
 
@@ -69,13 +66,22 @@ await api.post("/api/contributions/add", JSON.stringify(formData), {
         <h2 className="text-xl font-semibold">📤 Contribute Resource</h2>
         <input className="w-full p-2 border rounded" name="title" placeholder="Title" value={formData.title} onChange={handleChange} required />
         <textarea className="w-full p-2 border rounded" name="description" placeholder="Description" value={formData.description} onChange={handleChange} required />
-        <input className="w-full p-2 border rounded" name="type" placeholder="Type (e.g. Notes, Video)" value={formData.type} onChange={handleChange} required />
+        <select name="type" value={formData.type} onChange={handleChange} required>
+  <option value="">Select Type</option>
+  <option value="NOTES">Notes</option>
+  <option value="VIDEO">Video</option>
+  <option value="LINK">Link</option>
+</select>
+
+
         <input className="w-full p-2 border rounded" name="subject" placeholder="Subject" value={formData.subject} onChange={handleChange} required />
-        <select className="w-full p-2 border rounded" name="visibility" value={formData.visibility} onChange={handleChange} required>
-          <option value="">Select Visibility</option>
-          <option value="public">Public</option>
-          <option value="private">Private</option>
-        </select>
+        
+<select name="visibility" value={formData.visibility} onChange={handleChange} required>
+  <option value="">Select Visibility</option>
+  <option value="PUBLIC">Public</option>
+  <option value="PRIVATE">Private</option>
+</select>
+
         <input className="w-full p-2 border rounded" type="url" name="url" placeholder="Google Drive Link" value={formData.url} onChange={handleChange} required />
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Submit</button>
       </form>
