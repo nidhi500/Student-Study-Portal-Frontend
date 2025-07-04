@@ -1,19 +1,15 @@
 // src/components/Sidebar.js
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  Home,
-  User,
-  Bell,
-  CheckSquare,
-  BookOpen,
-  Share2,
-  LogOut,
+  Home, User, Bell, CheckSquare, BookOpen, Share2, LogOut, Menu
 } from 'lucide-react';
 
 export default function Sidebar({ user }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+
   if (!user) return null;
 
   const goToProfileSection = (sectionId) => {
@@ -22,13 +18,26 @@ export default function Sidebar({ user }) {
     } else {
       const section = document.getElementById(sectionId);
       section?.scrollIntoView({ behavior: 'smooth' });
+      setIsOpen(false); // Close drawer on mobile
     }
   };
 
   return (
-    <aside className="w-64 min-h-screen bg-gradient-to-b from-indigo-600 to-indigo-700 text-white p-6 flex flex-col justify-between sticky top-0">
-      {/* Top section */}
-      <div>
+    <>
+      {/* Mobile menu button */}
+      <div className="md:hidden p-4 bg-indigo-600 text-white flex justify-between items-center">
+        <h1 className="text-lg font-bold">🎓 {user.name}</h1>
+        <button onClick={() => setIsOpen(!isOpen)}>
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* Sidebar Drawer */}
+      <aside
+        className={`fixed z-40 top-0 left-0 w-64 h-full bg-gradient-to-b from-indigo-600 to-indigo-700 text-white p-6 transform transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:relative md:block`}
+      >
+        {/* Top Section */}
         <div className="mb-8">
           <h2 className="text-xl font-bold truncate">🎓 {user.name}</h2>
           <p className="text-sm text-indigo-200 truncate">{user.enrollment}</p>
@@ -44,19 +53,19 @@ export default function Sidebar({ user }) {
           <NavItem label="Library" icon={<BookOpen size={18} />} onClick={() => goToProfileSection('schedule')} />
           <NavItem label="Contribute" icon={<Share2 size={18} />} onClick={() => navigate('/contribute')} />
         </nav>
-      </div>
 
-      {/* Logout */}
-      <div className="mt-8">
-        <button
-          onClick={() => navigate('/logout')}
-          className="flex items-center gap-2 text-sm text-indigo-200 hover:text-white transition duration-200"
-        >
-          <LogOut size={18} />
-          Logout
-        </button>
-      </div>
-    </aside>
+        {/* Logout */}
+        <div className="mt-8">
+          <button
+            onClick={() => navigate('/logout')}
+            className="flex items-center gap-2 text-sm text-indigo-200 hover:text-white transition duration-200"
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }
 

@@ -1,8 +1,8 @@
-// src/pages/UnitPage.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useSearchParams } from "react-router-dom";
-import CommentSection from "../components/CommentSection";
+
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
 
 export default function UnitPage() {
   const { subjectId } = useParams();
@@ -17,12 +17,14 @@ export default function UnitPage() {
   const [pyqs, setPyqs] = useState([]);
   const [loadingUnits, setLoadingUnits] = useState(true);
   const [errorUnits, setErrorUnits] = useState(null);
+  console.log("🔗 Using BASE_URL:", BASE_URL);
+
 
   useEffect(() => {
     axios
-      .get(`/api/subjects/${subjectId}/units`)
+      .get(`${BASE_URL}/api/subjects/${subjectId}/units`)
       .then((res) => {
-        console.log("✅ Units fetched:", res.data); // <— Add this
+        console.log("✅ Units fetched:", res.data);
         setUnits(res.data);
         setLoadingUnits(false);
       })
@@ -38,7 +40,7 @@ export default function UnitPage() {
     if (!unitId) return;
 
     axios
-      .get(`/api/units/${unitId}/resources`)
+      .get(`${BASE_URL}/api/units/${unitId}/resources`)
       .then((res) => setResources(res.data))
       .catch((err) => {
         console.error("❌ Failed to fetch resources:", err);
@@ -46,7 +48,7 @@ export default function UnitPage() {
       });
 
     axios
-      .get(`/api/units/${unitId}/pyqs`)
+      .get(`${BASE_URL}/api/units/${unitId}/pyqs`)
       .then((res) => setPyqs(res.data))
       .catch((err) => {
         console.error("❌ Failed to fetch pyqs:", err);
@@ -60,8 +62,7 @@ export default function UnitPage() {
     const videoMatch = url?.match(/watch\?v=([a-zA-Z0-9_-]+)/);
     const playlistMatch = url?.match(/playlist\?list=([a-zA-Z0-9_-]+)/);
     if (videoMatch) return `https://www.youtube.com/embed/${videoMatch[1]}`;
-    if (playlistMatch)
-      return `https://www.youtube.com/embed/videoseries?list=${playlistMatch[1]}`;
+    if (playlistMatch) return `https://www.youtube.com/embed/videoseries?list=${playlistMatch[1]}`;
     if (url?.includes("youtube.com/embed/")) return url;
     return "";
   };
@@ -69,9 +70,7 @@ export default function UnitPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="px-6 py-4 bg-white shadow sticky top-0 z-10">
-        <h1 className="text-xl font-bold text-indigo-700">
-          {subjectName} — Units
-        </h1>
+        <h1 className="text-xl font-bold text-indigo-700">{subjectName} — Units</h1>
         <p className="text-sm text-gray-500">Select a unit to explore</p>
       </div>
 
@@ -85,20 +84,20 @@ export default function UnitPage() {
         <>
           {/* Unit Tabs */}
           <div className="flex gap-3 overflow-x-auto px-6 py-4">
-  {units.map((unit, idx) => (
-    <button
-      key={unit?.id || idx}
-      onClick={() => setActiveUnitIndex(idx)}
-      className={`px-4 py-2 rounded-full ${
-        idx === activeUnitIndex
-          ? "bg-indigo-600 text-white"
-          : "bg-white border text-indigo-600"
-      }`}
-    >
-      {unit?.name || `Unit ${idx + 1}`}
-    </button>
-  ))}
-</div>
+            {units.map((unit, idx) => (
+              <button
+                key={unit?.id || idx}
+                onClick={() => setActiveUnitIndex(idx)}
+                className={`px-4 py-2 rounded-full ${
+                  idx === activeUnitIndex
+                    ? "bg-indigo-600 text-white"
+                    : "bg-white border text-indigo-600"
+                }`}
+              >
+                {unit?.name || `Unit ${idx + 1}`}
+              </button>
+            ))}
+          </div>
 
           {/* Resource Tabs */}
           <div className="flex justify-center space-x-4 mb-4">
@@ -121,18 +120,14 @@ export default function UnitPage() {
           <div className="px-6">
             {activeTab !== "PYQ" ? (
               filteredResources.length === 0 ? (
-                <p className="text-gray-500">
-                  No {activeTab.toLowerCase()}s found.
-                </p>
+                <p className="text-gray-500">No {activeTab.toLowerCase()}s found.</p>
               ) : (
                 filteredResources.map((r) => (
                   <div
-                   key={r?.id || r?.title || Math.random()}
+                    key={r?.id || r?.title || Math.random()}
                     className="bg-white p-4 rounded-xl shadow-md border mb-4"
                   >
-                    <h2 className="font-semibold text-indigo-700 mb-2">
-                      {r.title}
-                    </h2>
+                    <h2 className="font-semibold text-indigo-700 mb-2">{r.title}</h2>
                     {r.type === "VIDEO" ? (
                       getEmbedUrl(r.url) ? (
                         <div className="relative pb-[56.25%] h-0 overflow-hidden rounded-md">
@@ -145,9 +140,7 @@ export default function UnitPage() {
                           />
                         </div>
                       ) : (
-                        <p className="text-red-500 text-sm">
-                          Invalid video URL
-                        </p>
+                        <p className="text-red-500 text-sm">Invalid video URL</p>
                       )
                     ) : (
                       <a
@@ -167,9 +160,7 @@ export default function UnitPage() {
             ) : (
               pyqs.map((pyq) => (
                 <div key={pyq.id} className="bg-white p-4 rounded shadow mb-4">
-                  <h3 className="font-bold text-indigo-700 mb-2">
-                    {pyq.questionText}
-                  </h3>
+                  <h3 className="font-bold text-indigo-700 mb-2">{pyq.questionText}</h3>
                   <a
                     href={pyq.pdfUrl}
                     target="_blank"
@@ -178,6 +169,7 @@ export default function UnitPage() {
                   >
                     View PYQ PDF
                   </a>
+                  {/* Uncomment if CommentSection is ready */}
                   {/* <CommentSection contextType="PYQ" contextId={pyq.id} /> */}
                 </div>
               ))
