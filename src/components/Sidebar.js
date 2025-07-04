@@ -1,4 +1,3 @@
-// src/components/Sidebar.js
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -18,27 +17,33 @@ export default function Sidebar({ user }) {
     } else {
       const section = document.getElementById(sectionId);
       section?.scrollIntoView({ behavior: 'smooth' });
-      setIsOpen(false); // Close drawer on mobile
+      setIsOpen(false);
     }
   };
 
   return (
-    <>
-      {/* Mobile menu button */}
-      <div className="md:hidden p-4 bg-indigo-600 text-white flex justify-between items-center">
+    <div className="flex h-screen">
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 p-4 bg-indigo-600 text-white flex justify-between items-center">
         <h1 className="text-lg font-bold">🎓 {user.name}</h1>
         <button onClick={() => setIsOpen(!isOpen)}>
           <Menu size={24} />
         </button>
       </div>
 
-      {/* Sidebar Drawer */}
+      {/* Sidebar */}
       <aside
-        className={`fixed z-40 top-0 left-0 w-64 h-full bg-gradient-to-b from-indigo-600 to-indigo-700 text-white p-6 transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:relative md:block`}
+        className={`
+          fixed md:relative z-40 top-0 left-0
+          w-64 h-full
+          bg-gradient-to-b from-indigo-600 to-indigo-700 text-white p-6
+          transform transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:translate-x-0 md:block
+        `}
       >
         {/* Top Section */}
-        <div className="mb-8">
+        <div className="mb-8 mt-10 md:mt-0">
           <h2 className="text-xl font-bold truncate">🎓 {user.name}</h2>
           <p className="text-sm text-indigo-200 truncate">{user.enrollment}</p>
           <p className="text-sm text-indigo-200 truncate">Goal: {user.branch?.name}</p>
@@ -65,7 +70,7 @@ export default function Sidebar({ user }) {
           </button>
         </div>
       </aside>
-    </>
+    </div>
   );
 }
 
