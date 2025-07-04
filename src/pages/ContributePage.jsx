@@ -44,9 +44,12 @@ const ContributePage = () => {
   }
 
   try {
-    console.log("🔍 Payload about to send:", JSON.stringify(formData));
+    await api.post("/api/contributions/add", formData, {
+  headers: {
+    "Content-Type": "application/json"
+  }
+});
 
-await api.post("/api/contributions/add", formData);
     console.log("✅ Contribution submitted successfully");
     alert("✅ Contribution submitted");
     setFormData({ title: "", description: "", type: "", subject: "", visibility: "", url: "" });
