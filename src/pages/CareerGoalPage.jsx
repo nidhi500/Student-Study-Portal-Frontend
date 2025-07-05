@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "../utils/axiosConfig";
 import StriverProgressSection from "../components/StriverProgressSection";
+import Header from "../components/Header";
 
 export default function CareerGoalPage() {
   const { goal } = useParams();
@@ -54,24 +55,24 @@ export default function CareerGoalPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <div className="px-6 py-4 bg-white shadow sticky top-0 z-10">
-        <h1 className="text-xl font-bold text-indigo-700 capitalize">
-          {goal} — Resources
-        </h1>
-        <p className="text-sm text-gray-500">Select a tab to explore</p>
+      <Header />
+
+      {/* Page Title */}
+      <div className="px-6 pt-6">
+        <h1 className="text-2xl font-bold text-indigo-700 capitalize">{goal} — Resources</h1>
+        <p className="text-sm text-gray-600 mb-4">Select a tab to explore</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex justify-center gap-4 mt-4 mb-8">
+      <div className="flex justify-center flex-wrap gap-3 px-4 mb-6">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded ${
+            className={`px-4 py-2 rounded-full font-medium text-sm transition ${
               activeTab === tab
                 ? "bg-indigo-500 text-white"
-                : "bg-indigo-100 text-indigo-700"
+                : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
             }`}
           >
             {tab === "STRIVER" ? "Striver Sheet" : tab}
@@ -80,7 +81,7 @@ export default function CareerGoalPage() {
       </div>
 
       {/* Content */}
-      <div className="px-6 max-w-6xl mx-auto">
+      <div className="px-4 pb-10 max-w-5xl mx-auto">
         {activeTab === "STRIVER" ? (
           <div className="bg-white p-6 rounded-xl shadow border">
             <StriverProgressSection />
@@ -96,7 +97,7 @@ export default function CareerGoalPage() {
               className="bg-white p-4 rounded-xl shadow-md border mb-4"
             >
               <h2 className="font-semibold text-indigo-700 mb-2">{r.title}</h2>
-              {r.type === "VIDEO" ? (
+              {r.type.toUpperCase() === "VIDEO" ? (
                 getEmbedUrl(r.url) ? (
                   <div className="relative pb-[56.25%] h-0 overflow-hidden rounded-md">
                     <iframe
