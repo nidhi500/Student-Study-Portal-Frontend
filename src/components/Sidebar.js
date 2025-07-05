@@ -3,13 +3,15 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Home, User, Bell, CheckSquare, BookOpen, Share2, LogOut, Menu
 } from 'lucide-react';
+import { toast } from "react-toastify";
+import { useAuthStore } from "../stores/authStore";
 
 export default function Sidebar({ user }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const logout = useAuthStore((state) => state.logout);
 
-  // ✅ Lock scroll on mobile when sidebar is open
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => {
@@ -26,6 +28,24 @@ export default function Sidebar({ user }) {
       const section = document.getElementById(sectionId);
       section?.scrollIntoView({ behavior: 'smooth' });
     }
+    setIsOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+
+    toast.success("✅ Logged out successfully", {
+      position: "top-center",
+      autoClose: 1500,
+      onClose: () => {
+        navigate("/", { replace: true });
+      },
+    });
+
+    setTimeout(() => {
+      navigate("/", { replace: true });
+    }, 2000);
+
     setIsOpen(false);
   };
 
@@ -52,13 +72,11 @@ export default function Sidebar({ user }) {
         className={`fixed z-40 top-0 left-0 w-64 min-h-screen bg-gradient-to-b from-indigo-600 to-indigo-700 text-white transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:relative md:block`}
       >
-        {/* Full-height Flexbox Layout */}
         <div className="flex flex-col h-full p-6">
           {/* Top Section */}
           <div className="mb-8 mt-6 md:mt-0">
             <h2 className="text-xl font-bold truncate">🎓 {user.name}</h2>
             <p className="text-sm text-indigo-200 truncate">{user.enrollment}</p>
-            <p className="text-sm text-indigo-200 truncate">Goal: {user.branch?.name}</p>
           </div>
 
           {/* Navigation */}
@@ -74,7 +92,7 @@ export default function Sidebar({ user }) {
           {/* Logout */}
           <div className="mt-6">
             <button
-              onClick={() => { navigate('/logout'); setIsOpen(false); }}
+              onClick={handleLogout}
               className="flex items-center gap-2 text-sm text-indigo-200 hover:text-white transition duration-200"
             >
               <LogOut size={18} />

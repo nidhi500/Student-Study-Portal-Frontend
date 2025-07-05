@@ -1,35 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check, Trash2, Plus } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 function TodoList() {
-  const [todos, setTodos] = useState([
-    { id: 1, text: "Complete Data Structures Assignment", done: false, userId: 1 },
-    { id: 2, text: "Prepare for GATE Mock Test", done: true, userId: 1 },
-    { id: 3, text: "Review Operating Systems Notes", done: false, userId: 1 },
-    { id: 4, text: "Submit Project Report", done: false, userId: 1 }
-  ]);
+  const [todos, setTodos] = useState([]);
   const [newTask, setNewTask] = useState('');
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error] = useState(null);
+
+  // Load todos from localStorage
+  useEffect(() => {
+    const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
+    setTodos(storedTodos);
+    setLoading(false);
+  }, []);
+
+  // Update localStorage when todos change
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
 
   const addTodo = () => {
     if (!newTask.trim()) return;
-
     const newTodo = {
-      id: Date.now(),
-      text: newTask,
+      id: uuidv4(),
+      text: newTask.trim(),
       done: false,
-      userId: 1
     };
-
     setTodos([...todos, newTodo]);
     setNewTask('');
   };
 
   const toggleDone = (id) => {
-    setTodos(todos.map(todo =>
+    setTodos(todos.map(todo => (
       todo.id === id ? { ...todo, done: !todo.done } : todo
-    ));
+    )));
   };
 
   const deleteTodo = (id) => {
@@ -40,10 +45,11 @@ function TodoList() {
   const totalCount = todos.length;
 
   return (
-    <section className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
+    <section className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden max-w-3xl mx-auto w-full">
+      
       {/* Header */}
       <div className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg">
               <Check className="w-6 h-6 text-indigo-600" />
@@ -53,7 +59,7 @@ function TodoList() {
               <p className="text-indigo-100">Stay organized and productive</p>
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-left sm:text-right">
             <p className="text-sm text-indigo-100">Progress</p>
             <p className="text-xl font-bold">{completedCount}/{totalCount}</p>
           </div>
@@ -72,17 +78,17 @@ function TodoList() {
 
       {/* Add Task Form */}
       <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && addTodo()}
+            onKeyDown={(e) => e.key === 'Enter' && addTodo()}
             placeholder="Add a new task..."
             className="flex-1 border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl px-4 py-3 text-sm dark:text-white focus:border-indigo-500 focus:outline-none transition-colors"
           />
           <button
             onClick={addTodo}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-xl transition-all duration-200 shadow hover:shadow-lg flex items-center gap-2"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-xl transition-all duration-200 shadow hover:shadow-lg flex items-center justify-center gap-2"
           >
             <Plus size={18} />
             <span className="font-semibold text-sm">Add</span>
@@ -119,7 +125,7 @@ function TodoList() {
           {todos.map((todo) => (
             <div
               key={todo.id}
-              className={`group p-4 rounded-xl transition-all duration-200 flex justify-between items-center ${
+              className={`group p-4 rounded-xl flex justify-between items-center transition-all duration-200 ${
                 todo.done
                   ? 'bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-600'
                   : 'bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-indigo-300'
@@ -137,7 +143,7 @@ function TodoList() {
                   {todo.done && <Check size={14} />}
                 </button>
                 <span
-                  className={`text-sm font-medium transition-all duration-200 ${
+                  className={`text-sm font-medium ${
                     todo.done ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-800 dark:text-white'
                   }`}
                 >
