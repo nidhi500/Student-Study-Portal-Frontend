@@ -48,12 +48,19 @@ const ContributePage = () => {
     try {
       await api.post("/api/contributions/add", formData, {
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       alert("✅ Contribution submitted");
-      setFormData({ title: "", description: "", type: "", subject: "", visibility: "", url: "" });
+      setFormData({
+        title: "",
+        description: "",
+        type: "",
+        subject: "",
+        visibility: "",
+        url: "",
+      });
 
       const res = await api.get("/api/contributions/my");
       setContributions(res.data);
@@ -64,7 +71,7 @@ const ContributePage = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto min-h-screen bg-gray-50">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto min-h-screen bg-gray-50">
       {/* 🔙 Back Button */}
       <button
         onClick={() => navigate("/profile")}
@@ -75,7 +82,10 @@ const ContributePage = () => {
       </button>
 
       {/* 📤 Contribution Form */}
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-lg space-y-4 border">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-4 sm:p-6 rounded-xl shadow-md space-y-4 border"
+      >
         <h2 className="text-2xl font-semibold text-indigo-700 mb-2">📤 Contribute Resource</h2>
 
         <input
@@ -144,7 +154,7 @@ const ContributePage = () => {
 
         <button
           type="submit"
-          className="bg-indigo-600 text-white px-5 py-2 rounded-md hover:bg-indigo-700 transition"
+          className="w-full sm:w-auto bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition"
         >
           Submit
         </button>

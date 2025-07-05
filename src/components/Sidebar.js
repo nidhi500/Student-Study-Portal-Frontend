@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Home, User, Bell, CheckSquare, BookOpen, Share2, LogOut, Menu
@@ -17,32 +17,50 @@ export default function Sidebar({ user }) {
     } else {
       const section = document.getElementById(sectionId);
       section?.scrollIntoView({ behavior: 'smooth' });
-      setIsOpen(false);
     }
+    setIsOpen(false); // ✅ Close on navigation
   };
 
+  // ✅ Lock scroll on mobile when sidebar is open
+ // eslint-disable-next-line react-hooks/rules-of-hooks
+ useEffect(() => {
+  if (isOpen) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+
+  return () => {
+    document.body.style.overflow = '';
+  };
+}, [isOpen]);
+
+
   return (
-    <div className="flex">
-      {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 p-4 bg-indigo-600 text-white flex justify-between items-center">
-        <h1 className="text-lg font-bold">🎓 {user.name}</h1>
-        <button onClick={() => setIsOpen(!isOpen)}>
+    <>
+      {/* Mobile Top Bar */}
+      <div className="md:hidden p-4 bg-indigo-600 text-white flex justify-between items-center fixed w-full z-40">
+        <h1 className="text-lg font-bold truncate">🎓 {user.name}</h1>
+        <button onClick={() => setIsOpen(true)}>
           <Menu size={24} />
         </button>
       </div>
 
-      {/* Sidebar */}
-      <aside
-  className={`
-    z-40 left-0 w-64 bg-gradient-to-b from-indigo-600 to-indigo-700 text-white p-6
-    transform transition-transform duration-300 ease-in-out
-    ${isOpen ? 'fixed top-0 h-full translate-x-0' : 'fixed top-0 h-full -translate-x-full'} 
-    md:relative md:translate-x-0 md:block md:h-auto
-  `}
->
+      {/* Overlay Background (mobile only) */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 z-30 md:hidden"
+          onClick={() => setIsOpen(false)}
+        ></div>
+      )}
 
+      {/* Sidebar Drawer */}
+      <aside
+        className={`fixed z-40 top-0 left-0 w-64 h-full bg-gradient-to-b from-indigo-600 to-indigo-700 text-white p-6 transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:relative md:block`}
+      >
         {/* Top Section */}
-        <div className="mb-8 mt-10 md:mt-0">
+        <div className="mb-8 mt-6 md:mt-0">
           <h2 className="text-xl font-bold truncate">🎓 {user.name}</h2>
           <p className="text-sm text-indigo-200 truncate">{user.enrollment}</p>
           <p className="text-sm text-indigo-200 truncate">Goal: {user.branch?.name}</p>
@@ -50,18 +68,18 @@ export default function Sidebar({ user }) {
 
         {/* Navigation */}
         <nav className="space-y-2">
-          <NavItem label="Home" icon={<Home size={18} />} onClick={() => navigate('/dashboard')} />
+          <NavItem label="Home" icon={<Home size={18} />} onClick={() => { navigate('/dashboard'); setIsOpen(false); }} />
           <NavItem label="Profile" icon={<User size={18} />} onClick={() => goToProfileSection('overview')} />
           <NavItem label="Reminders" icon={<Bell size={18} />} onClick={() => goToProfileSection('reminders')} />
           <NavItem label="To-Do List" icon={<CheckSquare size={18} />} onClick={() => goToProfileSection('todos')} />
           <NavItem label="Library" icon={<BookOpen size={18} />} onClick={() => goToProfileSection('schedule')} />
-          <NavItem label="Contribute" icon={<Share2 size={18} />} onClick={() => navigate('/contribute')} />
+          <NavItem label="Contribute" icon={<Share2 size={18} />} onClick={() => { navigate('/contribute'); setIsOpen(false); }} />
         </nav>
 
         {/* Logout */}
         <div className="mt-8">
           <button
-            onClick={() => navigate('/logout')}
+            onClick={() => { navigate('/logout'); setIsOpen(false); }}
             className="flex items-center gap-2 text-sm text-indigo-200 hover:text-white transition duration-200"
           >
             <LogOut size={18} />
@@ -69,7 +87,7 @@ export default function Sidebar({ user }) {
           </button>
         </div>
       </aside>
-    </div>
+    </>
   );
 }
 
