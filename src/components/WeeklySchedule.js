@@ -2,11 +2,6 @@ import React from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
-// Updated CSS imports
-import '@fullcalendar/common/main.css';
-import '@fullcalendar/daygrid/main.css';
-import '@fullcalendar/timegrid/main.css';
-
 const fakeClasses = [
   { title: '📐 Mathematics - Lecture', start: '2025-06-30T09:00:00', end: '2025-06-30T10:00:00', className: 'event-math' },
   { title: '🧪 Physics Lab', start: '2025-06-30T11:00:00', end: '2025-06-30T13:00:00', className: 'event-physics' },

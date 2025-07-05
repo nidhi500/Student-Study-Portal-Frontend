@@ -3,11 +3,6 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { useAuthStore } from '../stores/authStore';
 
-// Updated CSS imports
-import '@fullcalendar/common/main.css';
-import '@fullcalendar/daygrid/main.css';
-import '@fullcalendar/timegrid/main.css';
-
 export default function AssignmentCalendar() {
   const user = useAuthStore((state) => state.user);
   const [events, setEvents] = useState([]);
