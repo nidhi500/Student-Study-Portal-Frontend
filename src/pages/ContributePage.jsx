@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import api from "../utils/axiosConfig"; // ✅ Use the new axios instance
+import api from "../utils/axiosConfig";
 import CommentSection from "../components/CommentSection";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 function extractFileId(url) {
   const match = url.match(/(?:file\/d\/|id=)([a-zA-Z0-9_-]{10,})/);
@@ -18,6 +20,7 @@ const ContributePage = () => {
   });
 
   const [contributions, setContributions] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     api
@@ -27,7 +30,6 @@ const ContributePage = () => {
         console.error("GET contributions error:", err);
         alert("❌ Failed to fetch contributions");
       });
-      
   }, []);
 
   const handleChange = (e) => {
@@ -35,75 +37,143 @@ const ContributePage = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const isValidDrive = /^https:\/\/drive\.google\.com\/(?:file\/d\/|open\?id=)/.test(formData.url);
-  if (!isValidDrive) {
-    alert("❌ Invalid Google Drive link");
-    return;
-  }
+    const isValidDrive = /^https:\/\/drive\.google\.com\/(?:file\/d\/|open\?id=)/.test(formData.url);
+    if (!isValidDrive) {
+      alert("❌ Invalid Google Drive link");
+      return;
+    }
 
-  try {
-    await api.post("/api/contributions/add", formData, {
-  headers: {
-    "Content-Type": "application/json"
-  }
-});
+    try {
+      await api.post("/api/contributions/add", formData, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
-    console.log("✅ Contribution submitted successfully");
-    alert("✅ Contribution submitted");
-    setFormData({ title: "", description: "", type: "", subject: "", visibility: "", url: "" });
+      alert("✅ Contribution submitted");
+      setFormData({ title: "", description: "", type: "", subject: "", visibility: "", url: "" });
 
-    const res = await api.get("/api/contributions/my");
-    setContributions(res.data);
-  } catch (err) {
-    console.error("POST contribution error:", err);
-    alert("❌ Submission failed");
-  }
-};
-
+      const res = await api.get("/api/contributions/my");
+      setContributions(res.data);
+    } catch (err) {
+      console.error("POST contribution error:", err);
+      alert("❌ Submission failed");
+    }
+  };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-lg space-y-4">
-        <h2 className="text-xl font-semibold">📤 Contribute Resource</h2>
-        <input className="w-full p-2 border rounded" name="title" placeholder="Title" value={formData.title} onChange={handleChange} required />
-        <textarea className="w-full p-2 border rounded" name="description" placeholder="Description" value={formData.description} onChange={handleChange} required />
-        <select name="type" value={formData.type} onChange={handleChange} required>
-  <option value="">Select Type</option>
-  <option value="NOTES">Notes</option>
-  <option value="VIDEO">Video</option>
-  <option value="LINK">Link</option>
-</select>
+    <div className="p-6 max-w-4xl mx-auto min-h-screen bg-gray-50">
+      {/* 🔙 Back Button */}
+      <button
+        onClick={() => navigate("/profile")}
+        className="mb-6 inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-medium"
+      >
+        <ArrowLeft size={18} />
+        Back to Profile
+      </button>
 
+      {/* 📤 Contribution Form */}
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-lg space-y-4 border">
+        <h2 className="text-2xl font-semibold text-indigo-700 mb-2">📤 Contribute Resource</h2>
 
-        <input className="w-full p-2 border rounded" name="subject" placeholder="Subject" value={formData.subject} onChange={handleChange} required />
-        
-<select name="visibility" value={formData.visibility} onChange={handleChange} required>
-  <option value="">Select Visibility</option>
-  <option value="PUBLIC">Public</option>
-  <option value="PRIVATE">Private</option>
-</select>
+        <input
+          className="w-full p-3 border rounded-md"
+          name="title"
+          placeholder="Title"
+          value={formData.title}
+          onChange={handleChange}
+          required
+        />
+        <textarea
+          className="w-full p-3 border rounded-md"
+          name="description"
+          placeholder="Description"
+          rows="4"
+          value={formData.description}
+          onChange={handleChange}
+          required
+        />
 
-        <input className="w-full p-2 border rounded" type="url" name="url" placeholder="Google Drive Link" value={formData.url} onChange={handleChange} required />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Submit</button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <select
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            required
+            className="p-3 border rounded-md w-full"
+          >
+            <option value="">Select Type</option>
+            <option value="NOTES">Notes</option>
+            <option value="VIDEO">Video</option>
+            <option value="LINK">Link</option>
+          </select>
+
+          <input
+            name="subject"
+            placeholder="Subject"
+            value={formData.subject}
+            onChange={handleChange}
+            required
+            className="p-3 border rounded-md w-full"
+          />
+
+          <select
+            name="visibility"
+            value={formData.visibility}
+            onChange={handleChange}
+            required
+            className="p-3 border rounded-md w-full"
+          >
+            <option value="">Select Visibility</option>
+            <option value="PUBLIC">Public</option>
+            <option value="PRIVATE">Private</option>
+          </select>
+        </div>
+
+        <input
+          type="url"
+          name="url"
+          placeholder="Google Drive Link"
+          value={formData.url}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border rounded-md"
+        />
+
+        <button
+          type="submit"
+          className="bg-indigo-600 text-white px-5 py-2 rounded-md hover:bg-indigo-700 transition"
+        >
+          Submit
+        </button>
       </form>
 
-      <div className="mt-8 space-y-6">
-        <h3 className="text-lg font-semibold">🧾 Your Contributions</h3>
-        {contributions.map((item) => (
-          <div key={item.id} className="bg-white rounded-xl shadow-md p-4 space-y-2">
-            <h4 className="text-lg font-bold">{item.title}</h4>
-            <p className="text-sm text-gray-600">{item.description}</p>
-            <iframe
-              className="w-full h-52 rounded border"
-              src={`https://drive.google.com/file/d/${extractFileId(item.url)}/preview`}
-              allow="autoplay"
-              title={item.title}
-            />
-            <CommentSection contextType="CONTRIBUTION" contextId={item.id} />
-          </div>
-        ))}
+      {/* 🧾 Contributions List */}
+      <div className="mt-10 space-y-6">
+        <h3 className="text-xl font-semibold text-indigo-700">🧾 Your Contributions</h3>
+
+        {contributions.length === 0 ? (
+          <p className="text-gray-500">No contributions yet.</p>
+        ) : (
+          contributions.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white rounded-xl shadow-md p-5 border space-y-2"
+            >
+              <h4 className="text-lg font-bold text-indigo-800">{item.title}</h4>
+              <p className="text-sm text-gray-700">{item.description}</p>
+              <iframe
+                className="w-full h-64 rounded border"
+                src={`https://drive.google.com/file/d/${extractFileId(item.url)}/preview`}
+                allow="autoplay"
+                title={item.title}
+              />
+              <CommentSection contextType="CONTRIBUTION" contextId={item.id} />
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
