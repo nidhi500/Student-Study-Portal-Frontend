@@ -37,9 +37,7 @@ export default function LoginPage() {
         goal
       };
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      useAuthStore.getState().setUser(user, token); // ✅ CORRECT USAGE
+      useAuthStore.getState().setUser(user, token);
 
       navigate("/dashboard");
     } catch (err) {

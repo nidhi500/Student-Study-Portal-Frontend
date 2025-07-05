@@ -12,7 +12,6 @@ const LogoutButton = () => {
   const handleLogout = () => {
     console.log("🧪 Logout button clicked");
     logout();
-    localStorage.clear();
 
     toast.success("✅ Logged out successfully", {
       position: "top-center",
