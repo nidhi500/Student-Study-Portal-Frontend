@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { useAuthStore } from '../stores/authStore';
-import '@fullcalendar/common/main.css';
-import '@fullcalendar/daygrid/main.css';
+// ✅ Use this
+import '@fullcalendar/common/index.css';
+import '@fullcalendar/daygrid/index.css';     // for AssignmentCalendar
+import '@fullcalendar/timegrid/index.css';    // for WeeklySchedule
+
 
 export default function AssignmentCalendar() {
   const user = useAuthStore((state) => state.user);
