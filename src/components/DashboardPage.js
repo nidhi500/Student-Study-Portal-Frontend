@@ -1,10 +1,21 @@
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import LogoutButton from "./LogoutButton";
+import { useEffect, useState } from "react";
+import Loader from "./Loader";
+
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user) || {};
   const goal = user.goal || "Not Set";
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  const timeout = setTimeout(() => setLoading(false), 700); // adjust time if needed
+  return () => clearTimeout(timeout);
+}, []);
+
+if (loading) return <Loader message="Loading your dashboard..." />;
 
   const goalDescMap = {
     GATE: "Access GATE books, notes, and videos to build strong core concepts.",

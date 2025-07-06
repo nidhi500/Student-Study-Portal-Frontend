@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import API from "../api";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // 👁️ Import eye icons
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Loader from "./Loader"; // ✅ Loader added
 
 function SignupPage() {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ function SignupPage() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 👁️ Eye toggle
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -83,8 +84,8 @@ function SignupPage() {
       const res = await API.post("/api/auth/register", requestBody);
 
       const { token, name, email: userEmail, branch, currentSemester, goal } = res.data;
-
       const user = { name, email: userEmail, branch, currentSemester, goal };
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       useAuthStore.getState().setUser(user, token);
@@ -105,6 +106,8 @@ function SignupPage() {
     }
   };
 
+  if (loading) return <Loader message="Creating your account..." />;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-indigo-200">
       <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-xl">
@@ -116,7 +119,6 @@ function SignupPage() {
           <input type="text" name="name" placeholder="Full Name" required value={formData.name} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" />
           <input type="email" name="email" placeholder="Email" required value={formData.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" />
 
-          {/* 👁️ Password with eye toggle */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -169,7 +171,6 @@ function SignupPage() {
             <option value="OTHERS">Others</option>
           </select>
 
-          {/* Conditional fields */}
           {formData.goal === "OTHERS" && (
             <input type="text" name="otherGoal" placeholder="Please specify" value={formData.otherGoal} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
           )}
