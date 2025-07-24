@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import useAuthStore from "../stores/authStore"; // assuming you use Zustand
+import { useAuthStore } from "../stores/authStore";
 
 const ProtectedRoute = ({ children }) => {
   const user = useAuthStore((state) => state.user); // check Zustand store
