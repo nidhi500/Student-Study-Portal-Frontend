@@ -20,7 +20,6 @@ function SignupPage() {
     leetcode: "",
     github: "",
     skills: "",
-    profilePic: null,
   });
 
   const [error, setError] = useState("");
@@ -29,12 +28,8 @@ function SignupPage() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "profilePic") {
-      setFormData({ ...formData, profilePic: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const isFormValid = () => {
@@ -72,6 +67,7 @@ function SignupPage() {
       currentSemester: parseInt(formData.semester),
       dateOfBirth: formData.dob,
       gender: formData.gender,
+      goal: formData.goal,
       otherGoal: formData.otherGoal || "",
       leetcodeUrl: formData.leetcode || "",
       githubUrl: formData.github || "",
@@ -115,7 +111,17 @@ function SignupPage() {
 
         <form onSubmit={handleSignup} className="space-y-4">
           <input type="text" name="name" placeholder="Full Name" required value={formData.name} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" />
-          <input type="email" name="email" placeholder="Email" required value={formData.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" />
+
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            autoComplete="email"
+            required
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg"
+          />
 
           <div className="relative">
             <input
