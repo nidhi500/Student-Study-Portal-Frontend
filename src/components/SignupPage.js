@@ -1,126 +1,200 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../api";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuthStore } from "../stores/authStore";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Loader from "./Loader";
 
-export default function SignupPage() {
-  const navigate = useNavigate();
+function SignupPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    enrollment: "",
     branch: "",
-    currentSemester: "",
+    semester: "",
+    dob: "",
+    gender: "",
+    goal: "",
+    otherGoal: "",
+    leetcode: "",
+    github: "",
+    skills: "",
+    profilePic: null,
   });
 
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value, files } = e.target;
+    if (name === "profilePic") {
+      setFormData({ ...formData, profilePic: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const isFormValid = () => {
+    const {
+      name, email, password, enrollment, branch,
+      semester, dob, gender, goal, otherGoal, leetcode, github, skills,
+    } = formData;
+
+    if (!name || !email || !password || !enrollment || !branch || !semester || !dob || !gender || !goal)
+      return false;
+
+    if (goal === "OTHERS" && !otherGoal) return false;
+    if (goal === "PLACEMENT" && (!leetcode || !github || !skills)) return false;
+
+    return true;
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setErrorMsg("");
+    setError("");
 
-    const { name, email, password, branch, currentSemester } = formData;
+    if (!isFormValid()) {
+      setError("Please fill all required fields.");
+      return;
+    }
+
+    setLoading(true);
+
     const requestBody = {
-      name,
-      email,
-      password,
-      branch,
-      currentSemester,
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      enrollmentNumber: formData.enrollment,
+      branch: formData.branch,
+      currentSemester: parseInt(formData.semester),
+      dateOfBirth: formData.dob,
+      gender: formData.gender,
+      otherGoal: formData.otherGoal || "",
+      leetcodeUrl: formData.leetcode || "",
+      githubUrl: formData.github || "",
+      skills: formData.skills || "",
     };
 
-    console.log("📦 Signup Payload:", requestBody);
-
     try {
-      const res = await axios.post(
-        "https://student-study-portal-backend.onrender.com/api/auth/register",
-        requestBody
-      );
-      console.log("✅ Signup Success:", res.data);
-      setLoading(false);
-      navigate("/login");
+      const res = await API.post("/api/auth/register", requestBody);
+
+      const { token, name, email: userEmail, branch, currentSemester } = res.data;
+      const user = { name, email: userEmail, branch, currentSemester };
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      useAuthStore.getState().setUser(user, token);
+
+      navigate("/dashboard");
     } catch (err) {
-      console.error("❌ Signup Error:", err.response?.data || err.message);
-      setErrorMsg(err.response?.data?.message || "Signup failed. Please try again.");
+      const message =
+        err.response?.data?.message || err.response?.data?.error || "Signup failed";
+
+      if (message.toLowerCase().includes("email already exists")) {
+        setError("Email already exists. Redirecting to login...");
+        setTimeout(() => navigate("/login"), 2500);
+      } else {
+        setError("Signup failed: " + message);
+      }
+    } finally {
       setLoading(false);
     }
   };
 
+  if (loading) return <Loader message="Creating your account..." />;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <form
-        onSubmit={handleSignup}
-        className="bg-white p-6 rounded-xl shadow-md w-full max-w-md space-y-4"
-      >
-        <h2 className="text-2xl font-semibold text-center">Create Account</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-indigo-200">
+      <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-xl">
+        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">
+          Create an Account
+        </h2>
 
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          placeholder="Full Name"
-          className="w-full px-4 py-2 border rounded-md"
-        />
+        <form onSubmit={handleSignup} className="space-y-4">
+          <input type="text" name="name" placeholder="Full Name" required value={formData.name} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" />
+          <input type="email" name="email" placeholder="Email" required value={formData.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" />
 
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          placeholder="Email Address"
-          className="w-full px-4 py-2 border rounded-md"
-        />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg pr-10"
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
 
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          placeholder="Password"
-          className="w-full px-4 py-2 border rounded-md"
-        />
+          <input type="text" name="enrollment" placeholder="Enrollment Number" required value={formData.enrollment} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" />
 
-        <input
-          type="text"
-          name="branch"
-          value={formData.branch}
-          onChange={handleChange}
-          required
-          placeholder="Branch (e.g., ECE)"
-          className="w-full px-4 py-2 border rounded-md"
-        />
+          <div className="flex gap-4">
+            <select name="branch" value={formData.branch} onChange={handleChange} className="w-1/2 px-4 py-2 border rounded-lg" required>
+              <option value="">Select Branch</option>
+              <option value="ECE">ECE</option>
+              <option value="IT">IT</option>
+            </select>
+            <select name="semester" value={formData.semester} onChange={handleChange} className="w-1/2 px-4 py-2 border rounded-lg" required>
+              <option value="">Select Semester</option>
+              {[3, 4, 5, 6].map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
 
-        <input
-          type="text"
-          name="currentSemester"
-          value={formData.currentSemester}
-          onChange={handleChange}
-          required
-          placeholder="Current Semester (e.g., 3)"
-          className="w-full px-4 py-2 border rounded-md"
-        />
+          <input type="date" name="dob" value={formData.dob} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
 
-        {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
+          <select name="gender" value={formData.gender} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg">
+            <option value="">Select Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-        >
-          {loading ? "Signing up..." : "Sign Up"}
-        </button>
-      </form>
+          <select name="goal" value={formData.goal} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg">
+            <option value="">Select Goal</option>
+            <option value="PLACEMENT">Placement</option>
+            <option value="UPSC">UPSC</option>
+            <option value="GATE">GATE</option>
+            <option value="CAT">CAT</option>
+            <option value="OTHERS">Others</option>
+          </select>
+
+          {formData.goal === "OTHERS" && (
+            <input type="text" name="otherGoal" placeholder="Please specify" value={formData.otherGoal} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
+          )}
+
+          {formData.goal === "PLACEMENT" && (
+            <>
+              <input type="url" name="leetcode" placeholder="LeetCode URL" value={formData.leetcode} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
+              <input type="url" name="github" placeholder="GitHub URL" value={formData.github} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
+              <input type="text" name="skills" placeholder="Skills (comma separated)" value={formData.skills} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
+            </>
+          )}
+
+          <button type="submit" disabled={loading} className={`w-full ${loading ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"} text-white py-2 rounded-lg transition`}>
+            {loading ? "Registering..." : "Sign Up"}
+          </button>
+
+          {error && <p className="text-red-600 text-sm text-center mt-2">{error}</p>}
+        </form>
+
+        <p className="text-sm text-center text-gray-600 mt-6">
+          Already have an account?{" "}
+          <Link to="/login" className="text-indigo-600 font-medium hover:underline">Login</Link>
+        </p>
+      </div>
     </div>
   );
 }
+
+export default SignupPage;
