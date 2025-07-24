@@ -7,6 +7,7 @@ import Loader from "./Loader";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // 👁️ toggle
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -50,16 +51,57 @@ export default function LoginPage() {
         {error && (
           <div className="text-red-600 text-sm mb-4 text-center">{error}</div>
         )}
-        <form onSubmit={handleLogin} className="space-y-5">
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-4 py-2 border rounded-lg" />
-          <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-2 border rounded-lg" />
-          <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg transition">
+        <form
+          onSubmit={handleLogin}
+          className="space-y-5"
+          autoComplete="on" // enables browser autofill
+        >
+          <input
+            type="email"
+            name="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="w-full px-4 py-2 border rounded-lg"
+          />
+
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full px-4 py-2 border rounded-lg pr-16"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-2 text-sm text-indigo-600 hover:underline focus:outline-none"
+            >
+              {showPassword ? "🙈 Hide" : "👁️ Show"}
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg transition"
+          >
             Login
           </button>
         </form>
         <p className="text-sm text-gray-500 text-center mt-6">
           Don’t have an account?{" "}
-          <a href="/signup" className="text-indigo-600 hover:underline font-medium">Sign up</a>
+          <a
+            href="/signup"
+            className="text-indigo-600 hover:underline font-medium"
+          >
+            Sign up
+          </a>
         </p>
       </div>
     </div>
