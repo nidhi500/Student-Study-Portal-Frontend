@@ -1,50 +1,38 @@
 import React, { useState } from "react";
-import API from "../api";
-import { useNavigate, Link } from "react-router-dom";
-import { useAuthStore } from "../stores/authStore";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import Loader from "./Loader";
+import { useNavigate } from "react-router-dom";
+import { API } from "../api";
+import useAuthStore from "../store/authStore";
+import logo from "../assets/logo.svg";
 
-function SignupPage() {
+const SignupPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    enrollmentNumber: "", // changed from "enrollment"
-    branch: "",
-    currentSemester: "", // changed from "semester"
-    dateOfBirth: "", // changed from "dob"
+    dob: "",
     gender: "",
+    branch: "ECE",
+    currentSemester: "",
     goal: "",
     otherGoal: "",
-    leetcodeUrl: "", // changed from "leetcode"
-    githubUrl: "", // changed from "github"
-    skills: "",
+    leetcodeUrl: "",
   });
 
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const [error, setError] = useState("");
 
   const isFormValid = () => {
-    const {
-      name, email, password, enrollmentNumber, branch,
-      currentSemester, dateOfBirth, gender, goal, otherGoal, leetcodeUrl, githubUrl, skills,
-    } = formData;
-
-    if (!name || !email || !password || !enrollmentNumber || !branch || !currentSemester || !dateOfBirth || !gender || !goal)
-      return false;
-
-    if (goal === "OTHERS" && !otherGoal) return false;
-    if (goal === "PLACEMENT" && (!leetcodeUrl || !githubUrl || !skills)) return false;
-
-    return true;
+    return (
+      formData.name &&
+      formData.email &&
+      formData.password &&
+      formData.dob &&
+      formData.gender &&
+      formData.branch &&
+      formData.currentSemester &&
+      formData.goal
+    );
   };
 
   const handleSignup = async (e) => {
@@ -61,6 +49,7 @@ function SignupPage() {
     const requestBody = {
       ...formData,
       currentSemester: parseInt(formData.currentSemester),
+      goal: formData.goal.toUpperCase(), // 👈 Fix: Ensure goal is uppercase
     };
 
     try {
@@ -89,107 +78,143 @@ function SignupPage() {
     }
   };
 
-  if (loading) return <Loader message="Creating your account..." />;
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-indigo-200">
-      <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-xl">
-        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">
-          Create an Account
-        </h2>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 to-purple-200">
+      <img src={logo} alt="Logo" className="w-16 mb-4" />
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Create your account</h2>
 
-        <form onSubmit={handleSignup} className="space-y-4">
-          <input type="text" name="name" placeholder="Full Name" required value={formData.name} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" />
+      <form
+        onSubmit={handleSignup}
+        className="bg-white p-6 rounded-lg shadow-md w-full max-w-md space-y-4"
+      >
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Full Name"
+          className="input input-bordered w-full"
+        />
 
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Email"
+          className="input input-bordered w-full"
+          autoComplete="email" // 👈 Enable past email suggestion
+        />
+
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          placeholder="Password"
+          className="input input-bordered w-full"
+        />
+
+        <input
+          type="date"
+          name="dob"
+          value={formData.dob}
+          onChange={handleChange}
+          className="input input-bordered w-full"
+        />
+
+        <select
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          className="select select-bordered w-full"
+        >
+          <option value="">Select Gender</option>
+          <option value="FEMALE">Female</option>
+          <option value="MALE">Male</option>
+          <option value="OTHER">Other</option>
+        </select>
+
+        <select
+          name="branch"
+          value={formData.branch}
+          onChange={handleChange}
+          className="select select-bordered w-full"
+        >
+          <option value="ECE">ECE</option>
+        </select>
+
+        <input
+          type="number"
+          name="currentSemester"
+          value={formData.currentSemester}
+          onChange={handleChange}
+          placeholder="Current Semester"
+          className="input input-bordered w-full"
+        />
+
+        <select
+          name="goal"
+          value={formData.goal}
+          onChange={handleChange}
+          className="select select-bordered w-full"
+        >
+          <option value="">Select Career Goal</option>
+          <option value="placement">Placement</option>
+          <option value="gate">GATE</option>
+          <option value="cat">CAT</option>
+          <option value="upsc">UPSC</option>
+          <option value="others">Others</option>
+        </select>
+
+        {formData.goal === "others" && (
           <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            autoComplete="email"
-            required
-            value={formData.email}
+            type="text"
+            name="otherGoal"
+            value={formData.otherGoal}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg"
+            placeholder="Specify your goal"
+            className="input input-bordered w-full"
           />
+        )}
 
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg pr-10"
-            />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600"
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </span>
-          </div>
+        {(formData.goal === "placement" || formData.goal === "others") && (
+          <input
+            type="url"
+            name="leetcodeUrl"
+            value={formData.leetcodeUrl}
+            onChange={handleChange}
+            placeholder="LeetCode Profile URL (optional)"
+            className="input input-bordered w-full"
+          />
+        )}
 
-          <input type="text" name="enrollmentNumber" placeholder="Enrollment Number" required value={formData.enrollmentNumber} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg" />
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          <div className="flex gap-4">
-            <select name="branch" value={formData.branch} onChange={handleChange} className="w-1/2 px-4 py-2 border rounded-lg" required>
-              <option value="">Select Branch</option>
-              <option value="ECE">ECE</option>
-              <option value="IT">IT</option>
-            </select>
-            <select name="currentSemester" value={formData.currentSemester} onChange={handleChange} className="w-1/2 px-4 py-2 border rounded-lg" required>
-              <option value="">Select Semester</option>
-              {[3, 4, 5, 6].map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
+        <button
+          type="submit"
+          className="btn btn-primary w-full"
+          disabled={loading}
+        >
+          {loading ? "Creating Account..." : "Sign Up"}
+        </button>
 
-          <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
-
-          <select name="gender" value={formData.gender} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg">
-            <option value="">Select Gender</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
-          </select>
-
-          <select name="goal" value={formData.goal} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg">
-            <option value="">Select Goal</option>
-            <option value="PLACEMENT">Placement</option>
-            <option value="UPSC">UPSC</option>
-            <option value="GATE">GATE</option>
-            <option value="CAT">CAT</option>
-            <option value="OTHERS">Others</option>
-          </select>
-
-          {formData.goal === "OTHERS" && (
-            <input type="text" name="otherGoal" placeholder="Please specify" value={formData.otherGoal} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
-          )}
-
-          {formData.goal === "PLACEMENT" && (
-            <>
-              <input type="url" name="leetcodeUrl" placeholder="LeetCode URL" value={formData.leetcodeUrl} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
-              <input type="url" name="githubUrl" placeholder="GitHub URL" value={formData.githubUrl} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
-              <input type="text" name="skills" placeholder="Skills (comma separated)" value={formData.skills} onChange={handleChange} required className="w-full px-4 py-2 border rounded-lg" />
-            </>
-          )}
-
-          <button type="submit" disabled={loading} className={`w-full ${loading ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"} text-white py-2 rounded-lg transition`}>
-            {loading ? "Registering..." : "Sign Up"}
-          </button>
-
-          {error && <p className="text-red-600 text-sm text-center mt-2">{error}</p>}
-        </form>
-
-        <p className="text-sm text-center text-gray-600 mt-6">
+        <p className="text-center text-sm text-gray-600 mt-2">
           Already have an account?{" "}
-          <Link to="/login" className="text-indigo-600 font-medium hover:underline">Login</Link>
+          <span
+            onClick={() => navigate("/login")}
+            className="text-blue-500 underline cursor-pointer"
+          >
+            Log in
+          </span>
         </p>
-      </div>
+      </form>
     </div>
   );
-}
+};
 
 export default SignupPage;
