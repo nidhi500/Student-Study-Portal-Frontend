@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API } from "../api";
 import useAuthStore from "../stores/authStore";
-import logo from "../assets/logo.svg";
+
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -84,7 +84,7 @@ const SignupPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 to-purple-200">
-      <img src={logo} alt="Logo" className="w-16 mb-4" />
+      
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">Create your account</h2>
 
       <form
